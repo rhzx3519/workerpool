@@ -11,7 +11,7 @@ import (
 
 const (
 	// DefaultAntsPoolSize is the default capacity for a default goroutine pool.
-	DefaultWorkerpoolSize = math.MaxInt32
+	DefaultWorkerPoolSize = math.MaxInt32
 
 	// DefaultCleanIntervalTime is the interval time to clean up goroutines.
 	DefaultCleanIntervalTime = time.Second
@@ -24,12 +24,6 @@ const (
 	// CLOSED represents that the pool is closed.
 	CLOSED
 )
-
-// Logger is used for logging formatted messages.
-type Logger interface {
-	// Printf must have the same semantics as log.Printf.
-	Printf(format string, args ...interface{})
-}
 
 var (
 	// Error types for the Ants API.
@@ -73,4 +67,56 @@ var (
 	}()
 
 	defaultLogger = Logger(log.New(os.Stderr, "", log.LstdFlags))
+
+	// Init a instance pool when importing ants.
+	defaultWorkerPool, _ = NewPool(DefaultWorkerPoolSize)
 )
+
+// Logger is used for logging formatted messages.
+type Logger interface {
+	// Printf must have the same semantics as log.Printf.
+	Printf(format string, args ...interface{})
+}
+
+// Submit submits a task to pool.
+func Submit(task func()) error {
+	return defaultWorkerPool.Submit(task)
+}
+
+// Running returns the number of the currently running goroutines.
+func Running() int {
+	return defaultWorkerPool.Running()
+}
+
+// Cap returns the capacity of this default pool.
+func Cap() int {
+	return defaultWorkerPool.Cap()
+}
+
+// Free returns the available goroutines to work.
+func Free() int {
+	return defaultWorkerPool.Free()
+}
+
+// Release Closes the default pool.
+func Release() {
+	defaultWorkerPool.Release()
+}
+
+// Reboot reboots the default pool.
+func Reboot() {
+	defaultWorkerPool.Reboot()
+}
+
+
+
+
+
+
+
+
+
+
+
+
+

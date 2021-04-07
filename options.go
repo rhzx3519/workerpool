@@ -3,11 +3,11 @@ package workerpool
 import "time"
 
 // Option represents the optional function.
-type apply func(opts *Options)
+type consumer func(opts *Options)
 
-func loadOptions(applys ...apply) *Options {
+func loadOptions(actions ...consumer) *Options {
 	opts := new(Options)
-	for _, app := range applys {
+	for _, app := range actions {
 		app(opts)
 	}
 	return opts
@@ -39,4 +39,53 @@ type Options struct {
 	// Logger is the customized logger for logging info, if it is not set,
 	// default standard logger from log package is used.
 	Logger Logger
+}
+
+// WithOptions accepts the whole options config.
+func WithOptions(options Options) consumer {
+	return func(opts *Options) {
+		*opts = options
+	}
+}
+
+// WithExpiryDuration sets up the interval time of cleaning up goroutines.
+func WithExpiryDuration(expiryDuration time.Duration) consumer {
+	return func(opts *Options) {
+		opts.ExpiryDuration = expiryDuration
+	}
+}
+
+// WithPreAlloc indicates whether it should malloc for workers.
+func WithPreAlloc(preAlloc bool) consumer {
+	return func(opts *Options) {
+		opts.PreAlloc = preAlloc
+	}
+}
+
+// WithMaxBlockingTasks sets up the maximum number of goroutines that are blocked when it reaches the capacity of pool.
+func WithMaxBlockingTasks(maxBlockingTasks int) consumer {
+	return func(opts *Options) {
+		opts.MaxBlockingTasks = maxBlockingTasks
+	}
+}
+
+// WithNonblocking indicates that pool will return nil when there is no available workers.
+func WithNonblocking(nonblocking bool) consumer {
+	return func(opts *Options) {
+		opts.Nonblocking = nonblocking
+	}
+}
+
+// WithPanicHandler sets up panic handler.
+func WithPanicHandler(panicHandler func(interface{})) consumer {
+	return func(opts *Options) {
+		opts.PanicHandler = panicHandler
+	}
+}
+
+// WithLogger sets up a customized logger.
+func WithLogger(logger Logger) consumer {
+	return func(opts *Options) {
+		opts.Logger = logger
+	}
 }

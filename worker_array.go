@@ -18,7 +18,7 @@ type workerArray interface {
 	isEmpty() bool
 	// 放入一个新的worker
 	insert(worker *goWorker) error
-	// 获取一个活跃的worker
+	// 获取一个空闲的worker
 	detach() *goWorker
 	// 整理队列中已过期的worker，即recycleTime >= time.Now() - duration的goWorker
 	retrieveExpiry(duration time.Duration) []*goWorker
